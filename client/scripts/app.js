@@ -20,8 +20,16 @@ $(document).ready(function () {
       var rooms = {};
 
       $.each(data.results, function (i, userObj) {
-        box.append('<div>' + userObj.username + ': ' + userObj.text + '</div>'); 
-        console.log(userObj.roomname);
+        //add in rooms to the {rooms} (line 20)
+        // console.log(userObj.roomname);
+        if (rooms[userObj.roomname] !== 'undefined') {
+          rooms[userObj.roomname] = userObj.roomname;
+          console.log(rooms); 
+        }
+        if (userObj.username !== 'undefined') {
+          box.append('<div>' + userObj.username + ': ' + userObj.text + '</div>'); 
+        }
+        //box.append('<div data-id=' + userObj.username + '>' + userObj.username + ': ' + userObj.text + '</div>'); 
       });
     },
     error: function (data) {
@@ -53,16 +61,25 @@ $(document).ready(function () {
     });
   };
 
-  $('form').on('submit', function(e) {
+  app.handleSubmit = function (message) {
+    app.send(message);
+  };
+
+  app.handleUsernameClick = function() {
+    console.log('derp');
+  };
+  
+  $('#send').on('submit', function(e) {
     e.preventDefault();
     console.log('Form Submitted!');
     var message = {
       username: window.location.search,
-      text: $('#newMsg').val(),
+      text: $('#message').val(),
       roomname: 'lobby'
     };
 
-    app.send(message);
+    app.handleSubmit(message);
+   // app.send(message);
     //e.preventDefault();
    // $('#newMsg').val(); //perform some operations
     //this.submit(); //now submit the form
