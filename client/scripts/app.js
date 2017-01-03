@@ -5,7 +5,10 @@
 //   roomname: '4chan'
 // };
 var app = {};
+var friends = []; //store all friends - use to display ALL friend's messages
+
 $(document).ready(function () {
+  
   app.server = 'https://api.parse.com/1/classes/messages';
 
   app = $.ajax({
@@ -15,7 +18,7 @@ $(document).ready(function () {
     //data: JSON.stringify(message),
     contentType: 'application/json',
     success: function (data) {
-      console.log(data);
+    //  console.log(data);
       var box = $('#chats');
       var rooms = {};
 
@@ -24,12 +27,13 @@ $(document).ready(function () {
         // console.log(userObj.roomname);
         if (rooms[userObj.roomname] !== 'undefined') {
           rooms[userObj.roomname] = userObj.roomname;
-          console.log(rooms); 
+          //console.log(rooms); 
         }
+        var name = app.escapeHTML(userObj.username);
+        var text = app.escapeHTML(userObj.text);
         if (userObj.username !== 'undefined') {
-          box.append('<div>' + userObj.username + ': ' + userObj.text + '</div>'); 
+          box.append('<div class = \"' + name + '\">' + name + ': ' + text + '</div>'); 
         }
-        //box.append('<div data-id=' + userObj.username + '>' + userObj.username + ': ' + userObj.text + '</div>'); 
       });
     },
     error: function (data) {
@@ -37,10 +41,28 @@ $(document).ready(function () {
       console.error('chatterbox: Failed to send message', data);
     }
   });
+  console.log(app);
 
   app.init = function () {
     app.fetch();
+
   };
+
+  app.escapeHTML = function(str) {
+    return String(str)
+    .replace(/&/g, "&amp;")
+    .replace(/</g, "&lt;")
+    .replace(/>/g, "&gt;")
+    .replace(/"/g, "&quot;")
+    .replace(/'/g, "&#039;")
+    .replace(/\//g, "&#x2F;");
+  };
+
+  $('#refresh').on('click', function(e) {
+    e.preventDefault();
+
+    location.reload();
+  });
 
   //POST new data
   app.send = function (message) {
@@ -65,13 +87,32 @@ $(document).ready(function () {
     app.send(message);
   };
 
-  app.handleUsernameClick = function() {
-    console.log('derp');
+  //add a friend upon clicking their username
+  app.handleUsernameClick = function(username) {
+    var chats = $('#chats');
+    //var classes = username.split(' ');
+
+    console.log(chats.find('div.' + username));
+    chats.find('div.' + username).css('font-weight', 'Bold');
   };
+
+  $('div').on('click', function(e) {
+    e.preventDefault();
+    var selectedUser = $(e.target).attr('class');
+
+    if (friends.indexOf(selectedUser) === -1) {
+      friends.push(selectedUser); //push clicked Username to [friends]
+    }
+    app.handleUsernameClick(selectedUser);
+    console.log(friends);
+  });
   
+  /** Submit a Message **/
   $('#send').on('submit', function(e) {
     e.preventDefault();
     console.log('Form Submitted!');
+    //console.log($('#message').val());
+
     var message = {
       username: window.location.search,
       text: $('#message').val(),
@@ -79,21 +120,11 @@ $(document).ready(function () {
     };
 
     app.handleSubmit(message);
-   // app.send(message);
-    //e.preventDefault();
-   // $('#newMsg').val(); //perform some operations
-    //this.submit(); //now submit the form
   });
-
-  /*
-  $('#submitMsg').on('click', function () {
-    console.log('submit button clicked!');
-    app.send(message);
-  }); */
 
   //GET username info
   app.fetch = function () {
-    console.log(app.server);
+    //console.log(app.server);
     $.ajax({
       // This is the url you should use to communicate with the parse API server.
       url: app.server,
