@@ -27,8 +27,19 @@
     <div id="main">
       <h1>chatterbox</h1>
       <!-- Your HTML goes here! -->
-      <textarea rows="4" cols="50"></textarea>
-      <input id = "sendMsg" type="submit" value="Submit">
+      <select id="roomSelect">
+        <option value="dota">Dota 2</option>
+    <!--    <option value="cs">CS:GO</option>
+        <option value="league">League</option> -->
+      </select>
+      <form>
+        Enter Your Message Below:<br>
+        <textarea id = "newMsg" rows="4" cols="50"></textarea>
+        <input type="submit" value="Submit">
+      </form> 
+
+      <!-- <textarea id = "newMsg" rows="4" cols="50"></textarea>
+      <button id = "submitMsg">Submit</button> -->
     </div>
     <div id="chats"></div>
   </body>
